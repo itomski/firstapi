@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
+    <title th:text="${title}"></title>
+</head>
+<body>
+
+    <nav class="container">
+        <ul class="nav">
+            <li class="nav-item"><a class="nav-link" th:href="@{/}">Home</a></li>
+            <li class="nav-item"><a class="nav-link" th:href="@{/products}">Produktliste</a></li>
+            <li class="nav-item"><a class="nav-link" th:href="@{/products/new}">Neues Produkt</a></li>
+        </ul>
+    </nav>
+
+    <hr>
+
+    <main class="container">
+        <div class="row">
+            <th:block th:if="${form}">
+                <div class="col-6">
+                    <h2>Neues Produkt</h2>
+                    <form action="">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Produkt:</label>
+                            <input type="text" id="name" name="name" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Beschreibung:</label>
+                            <textarea type="text" id="description" name="description" class="form-control"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label">Anzahl:</label>
+                            <!-- id-Attribut ist für JavaScript und Labels interessant.
+                            Muss einmalig in diesem Dokument sein.
+                            name-Attribut ist für das Versenden der Daten wichtig d.h. für Java
+                            -->
+                            <input type="text" id="quantity" name="quantity" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Preis:</label>
+                            <input type="text" id="price" name="price" class="form-control">
+                        </div>
+                        <button class="btn btn-success">Speichern</button>
+                    </form>
+                </div>
+            </th:block>
+            <th:block th:unless="${form}">
+                <div class="col-3" th:each="p : ${productList}">
+                    <div class="card mb-3">
+                        <img th:src="@{${p.image}}" class="card-img-top" th:alt="${p.name}">
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${p.name}"></h5>
+                            <p class="card-text" th:text="${p.description}"></p>
+                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                    </div>
+                </div>
+            </th:block>
+        </div>
+    </main>
+
+    <script th:src="@{/webjars/bootstrap/5.3.8/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

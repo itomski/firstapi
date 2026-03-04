@@ -1,0 +1,12 @@
+body {
+    /* color: #f00; */
+    color: rgb(255,0,0);
+}
+
+table {
+    border: 1px solid #000;
+}
+
+table td, th  {
+    border: 1px solid #000;
+}
