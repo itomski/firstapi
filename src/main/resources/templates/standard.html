@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.13.1/font/bootstrap-icons.min.css}">
     <title th:text="${title}"></title>
 </head>
 <body>
@@ -22,16 +23,25 @@
     <main class="container">
         <div class="row">
             <th:block th:if="${form}">
+
                 <div class="col-6">
                     <h2>Neues Produkt</h2>
-                    <form action="">
+                    <form action="/products/save" method="post" th:object="${product}">
+
+                        <input type="hidden" name="id" th:value="${id}">
+
                         <div class="mb-3">
                             <label for="name" class="form-label">Produkt:</label>
-                            <input type="text" id="name" name="name" class="form-control">
+                            <input type="text" class="form-control" th:field="*{name}">
+                            <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
                         </div>
                         <div class="mb-3">
                             <label for="description" class="form-label">Beschreibung:</label>
-                            <textarea type="text" id="description" name="description" class="form-control"></textarea>
+                            <textarea type="text" class="form-control" th:field="*{description}"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="img" class="form-label">Bild:</label>
+                            <input type="text" class="form-control" th:field="*{img}">
                         </div>
                         <div class="mb-3">
                             <label for="quantity" class="form-label">Anzahl:</label>
@@ -39,11 +49,14 @@
                             Muss einmalig in diesem Dokument sein.
                             name-Attribut ist für das Versenden der Daten wichtig d.h. für Java
                             -->
-                            <input type="text" id="quantity" name="quantity" class="form-control">
+                            <input type="text" class="form-control" th:field="*{quantity}">
                         </div>
                         <div class="mb-3">
                             <label for="price" class="form-label">Preis:</label>
-                            <input type="text" id="price" name="price" class="form-control">
+                            <div class="input-group">
+                                <input type="text" class="form-control" th:field="*{price}">
+                                <span class="input-group-text" id="basic-addon2">€</span>
+                            </div>
                         </div>
                         <button class="btn btn-success">Speichern</button>
                     </form>
@@ -56,7 +69,8 @@
                         <div class="card-body">
                             <h5 class="card-title" th:text="${p.name}"></h5>
                             <p class="card-text" th:text="${p.description}"></p>
-                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                            <a th:href="@{'/products/delete/' + ${p.id}}" class="btn btn-danger"><i class="bi bi-trash3"></i></a>
+                            <a th:href="@{/products/edit/{id}(id=${p.id})}" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
                         </div>
                     </div>
                 </div>
