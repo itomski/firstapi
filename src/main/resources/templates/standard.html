@@ -22,41 +22,64 @@
 
     <main class="container">
         <div class="row">
-            <th:block th:if="${form}">
+            <th:block th:if="${showCart}">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cart">
+                    <i class="bi bi-cart"></i>
+                </button>
+                <div class="modal fade" id="cart" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="cartModalLabel">Einkaufswagen</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <ul>
+                                    <li th:each="p : ${cart}" th:text="${p.name}"></li>
+                                </ul>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </th:block>
 
+            <th:block th:if="${form}">
                 <div class="col-6">
                     <h2>Neues Produkt</h2>
-                    <form action="/products/save" method="post" th:object="${product}">
+                    <form action="/products/save" method="post" th:object="${productRequest}">
 
                         <input type="hidden" name="id" th:value="${id}">
 
                         <div class="mb-3">
                             <label for="name" class="form-label">Produkt:</label>
-                            <input type="text" class="form-control" th:field="*{name}">
-                            <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+                            <input type="text" class="form-control" th:field="*{name}" th:errorclass="is-invalid">
+                            <p class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
                         </div>
                         <div class="mb-3">
                             <label for="description" class="form-label">Beschreibung:</label>
-                            <textarea type="text" class="form-control" th:field="*{description}"></textarea>
+                            <textarea type="text" class="form-control" th:field="*{description}" th:errorclass="is-invalid"></textarea>
+                            <p class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></p>
                         </div>
                         <div class="mb-3">
                             <label for="img" class="form-label">Bild:</label>
-                            <input type="text" class="form-control" th:field="*{img}">
+                            <input type="text" class="form-control" th:field="*{img}" th:errorclass="is-invalid">
+                            <p class="invalid-feedback" th:if="${#fields.hasErrors('img')}" th:errors="*{img}"></p>
                         </div>
                         <div class="mb-3">
                             <label for="quantity" class="form-label">Anzahl:</label>
-                            <!-- id-Attribut ist für JavaScript und Labels interessant.
-                            Muss einmalig in diesem Dokument sein.
-                            name-Attribut ist für das Versenden der Daten wichtig d.h. für Java
-                            -->
-                            <input type="text" class="form-control" th:field="*{quantity}">
+                            <input type="text" class="form-control" th:field="*{quantity}" th:errorclass="is-invalid">
+                            <p class="invalid-feedback" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}"></p>
                         </div>
                         <div class="mb-3">
                             <label for="price" class="form-label">Preis:</label>
                             <div class="input-group">
-                                <input type="text" class="form-control" th:field="*{price}">
+                                <input type="text" class="form-control" th:field="*{price}" th:errorclass="is-invalid">
                                 <span class="input-group-text" id="basic-addon2">€</span>
                             </div>
+                            <p class="invalid-feedback" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></p>
                         </div>
                         <button class="btn btn-success">Speichern</button>
                     </form>
@@ -71,6 +94,7 @@
                             <p class="card-text" th:text="${p.description}"></p>
                             <a th:href="@{'/products/delete/' + ${p.id}}" class="btn btn-danger"><i class="bi bi-trash3"></i></a>
                             <a th:href="@{/products/edit/{id}(id=${p.id})}" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                            <a th:href="@{/products/cart/add/{id}(id=${p.id})}" class="btn btn-success"><i class="bi bi-cart"></i></a>
                         </div>
                     </div>
                 </div>

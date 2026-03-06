@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
+
 // Seit Java 14
 public record ProductRequest(
         @NotEmpty @Size(min = 2, max = 100) String name,

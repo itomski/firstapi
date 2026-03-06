@@ -1,5 +1,6 @@
 package de.lubowiecki.firstapi.products;
 
+import de.lubowiecki.firstapi.Category;
 import jakarta.persistence.*;
 
 @Entity
@@ -20,6 +21,17 @@ public class Product {
     private double price;
 
     private int quantity;
+
+    @ManyToOne
+    private Category category;
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
 
     public Product() {
     }

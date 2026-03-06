@@ -4,6 +4,11 @@ import de.lubowiecki.firstapi.products.Product;
 import de.lubowiecki.firstapi.products.ProductRepository;
 import de.lubowiecki.firstapi.products.ProductRequest;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,15 +17,17 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import java.awt.*;
 import java.util.Optional;
 
 @Controller // Controller für HTML-Ausgabe
 public class MainController {
 
     private ProductRepository productRepo;
+
+    //@Qualifier("shoppingCart")
+    @Autowired
+    private ShoppingCart cart;
 
     // Wird automatisch vom Spring-Container aufgerufen
     public MainController(ProductRepository productRepo) {
@@ -30,6 +37,8 @@ public class MainController {
     @GetMapping // http://localhost:8080
     public String startseite(Model ui) { // Model transportiert Werte der Methode an die HTML-Vorlage
         ui.addAttribute("title", "Startseite");
+        ui.addAttribute("showCart", true);
+        ui.addAttribute("cart", cart.getProducts());
         return "standard"; // Name der HTML-Vorlage aus dem resources/templates-Ordner
     }
 
@@ -40,12 +49,20 @@ public class MainController {
         return "standard";
     }
 
+    @GetMapping("/products/{page}") // http://localhost:8080/products
+    public String productListByPage(@PathVariable int page, Model ui) {
+        ui.addAttribute("title", "Produkte");
+        Pageable pageable = PageRequest.of(page, 20, Sort.by("name"));
+        ui.addAttribute("productList", productRepo.findAll(pageable));
+        return "standard";
+    }
+
     @GetMapping("/products/new") // http://localhost:8080/products/new
     public String productForm(Model ui) {
         ui.addAttribute("title", "Neues Produkt");
         ui.addAttribute("form", true);
         ui.addAttribute("id", 0);
-        ui.addAttribute("product", new ProductRequest("", "", "", "0", 0));
+        ui.addAttribute("productRequest", new ProductRequest("", "", "", "0", 0));
         return "standard";
     }
 
@@ -57,15 +74,15 @@ public class MainController {
 //    }
 
     @PostMapping("/products/save")
-    public String saveProduct(@Valid ProductRequest product, BindingResult result, long id, Model ui) {
+    public String saveProduct(@Valid ProductRequest productRequest, BindingResult result, long id, Model ui) {
         if(result.hasErrors()) {
             ui.addAttribute("form", true);
-            ui.addAttribute("product", product);
+            ui.addAttribute("productRequest", productRequest);
             ui.addAttribute("id", id);
             return "standard"; // Zurück zum Formular
         }
         else {
-            Product p = product.toProduct();
+            Product p = productRequest.toProduct();
             if (id > 0) {
                 p.setId(id);
             }
@@ -81,13 +98,19 @@ public class MainController {
         return "redirect:/products";
     }
 
+    @GetMapping("/products/cart/add/{id}")
+    public String addProductToCart(@PathVariable long id) {
+        productRepo.findById(id).ifPresent(p -> cart.add(p));
+        return "redirect:/products";
+    }
+
     @GetMapping("/products/edit/{id}")
     public String editProduct(@PathVariable long id, Model ui) {
         Optional<Product> opt = productRepo.findById(id);
         if(opt.isPresent()) {
             // TODO: Formular füllen
             ui.addAttribute("form", true);
-            ui.addAttribute("product", ProductRequest.fromProduct(opt.get()));
+            ui.addAttribute("productRequest", ProductRequest.fromProduct(opt.get()));
             ui.addAttribute("id", id);
             return "standard";
         }
